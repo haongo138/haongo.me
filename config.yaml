@@ -1,4 +1,5 @@
-baseURL: /
+baseURL: ''
+relativeURLs: true
 languageCode: vi-vn
 title: TheAmazingLab
 theme: PaperMod

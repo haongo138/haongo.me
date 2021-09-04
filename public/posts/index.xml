@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Bài viết on TheAmazingLab</title>
+    <link>haongo.me/posts/</link>
+    <description>Recent content in Bài viết on TheAmazingLab</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>vi-vn</language>
+    <lastBuildDate>Tue, 31 Aug 2021 15:09:24 +0700</lastBuildDate><atom:link href="haongo.me/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Airflow Dags The Right Way</title>
+      <link>haongo.me/posts/airflow-dags-the-right-way/</link>
+      <pubDate>Tue, 31 Aug 2021 15:09:24 +0700</pubDate>
+      
+      <guid>haongo.me/posts/airflow-dags-the-right-way/</guid>
+      <description>TLDR;
+Sau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag &amp;amp; sau một thời gian thành con rơi, không ai maintain nữa.
+Mình tin rằng nhất định có một cách viết dags khác:
+ Đơn giản &amp;amp; hiệu quả hơn thế 500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức Dễ dàng cho việc monitor, alerting khi có biến xảy ra Upgrade core của airflow không cần phải thay đổi các dags config hiện tại.</description>
+    </item>
+    
+    <item>
+      <title>Path to airflow 2</title>
+      <link>haongo.me/posts/apache-airflow/</link>
+      <pubDate>Fri, 20 Aug 2021 18:09:24 +0700</pubDate>
+      
+      <guid>haongo.me/posts/apache-airflow/</guid>
+      <description>Airflow in the nut shell:
+ Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò. Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job  Ví dụ như là select vào rows từ MySQL Thêm ít gia vị (Cooking) Load vào Datawarehouse    Ké vài miếng quảng cáo
+ Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất.</description>
+    </item>
+    
+  </channel>
+</rss>

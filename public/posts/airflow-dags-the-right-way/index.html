@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="vi" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Airflow Dags The Right Way | TheAmazingLab</title>
+<meta name="keywords" content="airflow, data_engineering" />
+<meta name="description" content="TLDR;
+Sau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag &amp; sau một thời gian thành con rơi, không ai maintain nữa.
+Mình tin rằng nhất định có một cách viết dags khác:
+ Đơn giản &amp; hiệu quả hơn thế 500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức Dễ dàng cho việc monitor, alerting khi có biến xảy ra Upgrade core của airflow không cần phải thay đổi các dags config hiện tại.">
+<meta name="author" content="">
+<link rel="canonical" href="haongo.me/posts/airflow-dags-the-right-way/" />
+<link crossorigin="anonymous" href="/haongo.me/assets/css/stylesheet.min.9f1d947375927e9847272b1f4e9be81336f539e513bf04d52cade31f81cad1af.css" integrity="sha256-nx2Uc3WSfphHJysfTpvoEzb1OeUTvwTVLK3jH4HK0a8=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/haongo.me/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js" integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5&#43;kdJvBz5iKbt6B5PJI="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="haongo.me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="haongo.me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="haongo.me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="haongo.me/apple-touch-icon.png">
+<link rel="mask-icon" href="haongo.me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.88.0" />
+<meta property="og:title" content="Airflow Dags The Right Way" />
+<meta property="og:description" content="TLDR;
+Sau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag &amp; sau một thời gian thành con rơi, không ai maintain nữa.
+Mình tin rằng nhất định có một cách viết dags khác:
+ Đơn giản &amp; hiệu quả hơn thế 500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức Dễ dàng cho việc monitor, alerting khi có biến xảy ra Upgrade core của airflow không cần phải thay đổi các dags config hiện tại." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="haongo.me/posts/airflow-dags-the-right-way/" /><meta property="og:image" content="/haongo.me/posts/airflow-dags-the-right-way/images/dags-config.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-08-31T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-08-31T15:09:24&#43;07:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="/haongo.me/posts/airflow-dags-the-right-way/images/dags-config.png"/>
+<meta name="twitter:title" content="Airflow Dags The Right Way"/>
+<meta name="twitter:description" content="TLDR;
+Sau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag &amp; sau một thời gian thành con rơi, không ai maintain nữa.
+Mình tin rằng nhất định có một cách viết dags khác:
+ Đơn giản &amp; hiệu quả hơn thế 500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức Dễ dàng cho việc monitor, alerting khi có biến xảy ra Upgrade core của airflow không cần phải thay đổi các dags config hiện tại."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bài viết",
+      "item": "haongo.me/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Airflow Dags The Right Way",
+      "item": "haongo.me/posts/airflow-dags-the-right-way/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Airflow Dags The Right Way",
+  "name": "Airflow Dags The Right Way",
+  "description": "TLDR;\nSau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag \u0026amp; sau một thời gian thành con rơi, không ai maintain nữa.\nMình tin rằng nhất định có một cách viết dags khác:\n Đơn giản \u0026amp; hiệu quả hơn thế 500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức Dễ dàng cho việc monitor, alerting khi có biến xảy ra Upgrade core của airflow không cần phải thay đổi các dags config hiện tại.",
+  "keywords": [
+    "airflow", "data_engineering"
+  ],
+  "articleBody": "TLDR;\nSau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag \u0026 sau một thời gian thành con rơi, không ai maintain nữa.\nMình tin rằng nhất định có một cách viết dags khác:\n Đơn giản \u0026 hiệu quả hơn thế 500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức Dễ dàng cho việc monitor, alerting khi có biến xảy ra Upgrade core của airflow không cần phải thay đổi các dags config hiện tại.  Ké vài miếng quảng cáo\n Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất. Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build \u0026 publish cho hơn 500 anh em TIKI xài.  Đến ngay với team data nhé: JD đây nè (Hoặc gửi CV vào mail mình hien.pham2@tiki.vn)\nBối cảnh Bài viết này là cách mình thiết kế \u0026 tổ chức config cho airflow (trước thềm đú trend lên cloud).\nNếu bạn đam mê về technical, tham khảo bài viết Path to airflow 2 ở TIKI nhé.\nNhững vấn đề đối với cách viết dags hiện tại:\n Những chuổi ngày copy - paste lăp đi lặp lại (nghe giống DRY - Don’t Repeat Your Self Principle không). Nếu không được tổ chức đúng cách, reviews kỹ lưỡng có thể dẫn đến con đường đập đi xây lại một ngày không xa (duplicated and unmaintainable code). Non - tech users (các bạn analytics, BA …) phải tốn thời gian học python, cách import module như thế nào cho đúng. Điều này dẫn đến một lúc nào đó các chú culi 4.0 (aka data engineer) phải ngồi viết dùm dags cho các em xinh đẹp =)) (Cho chừa tội mê gái) We can do better!  Thế là nông dân quyết tâm thiết kế một cách viết riêng để có thể viết dag một cách ổn định nhất nhất, kể cả khi core của airflow thay đổi (ví dụ import path thay đổi, params thay đổi …)\nResearch (Lúc này là tháng 09/2019) Mình bắt đầu thử với các keywords: dag config, dag factory, dag yaml, …\nResearch 1 hồi thì tìm được dag-factory opensource, tương lai đây rồi.\nVới dag-factory thì có 1 số vấn đề mình cần giải quyết:\n users vẫn phải input full cái import path cho operator → Cần pải tạo alias name  Ví dụ airflow.operators.bash_operator.BashOperator → BashOperator   Chỉ cần input những thông tin quan trong.  vd với operator airflow.contrib.operators.bigquery_operator.BigQueryOperator chỉ cần truyền vào: sql , destination_dataset_table. Không cần phải truyền thêm gcp_conn_id, cái option như create_disposition, write_disposition   Tự động phân quyền dags \u0026 set connection_id tương ứng cho mỗi team.  vd team 1 thì dùng bigquery_conn_id=team1, dù users có truyền connection_id thì vẫn phải override ở code.   Cần phải force một số conventions:  Mỗi team sẽ có 1 prefix riêng, tiện cho việc phân biệt. Tên file = tên dag → Dễ debug khi có biến.    ⇒ Phải đổi một xíu cái lib dag factory này.\nLet’s start ! Với những tinh hoa được học từ thanh niên cứng (SOLID), Open for Extension, Closed For Modification. Giờ không đuợc thay đổi code của dag-factory mà mình sẽ extend nó.\nTức là thay vì vào edit code để support gắn conn_id, operator alias thì mình sẽ tạo thêm 1 layer phía trên và tiến hành convert nó đúng với format mà dag-factory cần.\nBắt đầu với thiết kế alias cho operators\nclass OperatorAlias: # alias name: BigQueryOperator name: str # full module path: airflow.providers.google.cloud.operators.bigquery.BigQueryExecuteQueryOperator module: str # json schema, use for validate the user inputs. # {\"type\": \"object\", \"properties\": {\"sql\": {\"type\": \"string\", \"minLength\": 2 }}, \"required\": [\"sql\"]} schema: dict # set the default params like connections ... # {\"bigquery_conn_id\": \"gcp_girls\", \"allow_large_results\": true, ...} default_params: dict Với thiết kế 1 alias như trên, bây giờ thay vì phải viết một file python như thế này\nfrom airflow import DAG from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator from .. import BigQueryTableToOLAPOperator default_args = { 'owner': 'my@names.com', } with DAG( 'tutorial', default_args=default_args, schedule_interval='0 3 * * *', tags=['dwh','etl'], ) as dag: t1 = BigQueryExecuteQueryOperator( task_id='ext_girls', sql='SELECT * FROM girls WHERE age = 18 and age , destination_dataset_table='tiktok_clone.girls_available', gcp_conn_id='gcp_girls', create_disposition=\"CREATE_IF_NEEDED\", write_disposition=\"WRITE_TRUNCATE\", allow_large_results=True, ) t2 = BigQueryTableToOLAPOperator( task_id='sync_to_olap', table='tiktok_clone.girls_available', gcp_conn_id='gcp_girls', druid_conn_id='k8s_druid', date_column='date', ) t1  t2 Chỉ cần viết 1 file yaml.\n# ext_available_girls.yaml default_args: owner: 'my@names.com' schedule_interval: '0 3 * * *' tags: - dwh - etl tasks: ext_girls: operator: BigQueryOperator sql: 'SELECT * FROM girls WHERE age = 18 and age destination_dataset_table: tiktok_clone.girls_available sync_to_olap: operator: BigQueryTableToOLAPOperator table: tiktok_clone.girls_available druid_destination_table: girls_available dependencies: - ext_girls Xịn rồi, coi ngày \u0026 deploy thôi anh em ơi.\nPhân Quyền PoC (Proof of Concept) cơ bản đã hoạt động được, tiếp theo cần phải giải quyết vấn đề tự động phân quyền \u0026 set các connections for mỗi team.\nMỗi team sẽ có 1 role riêng, các DAG sẽ được gắn quyền read trên role này.\nÝ tưởng ban đần là mỗi team sẽ có role riêng, các connection_id, \u0026 alert connection_id riêng luôn.\nteams: - name: finances # airflow role_id role_id: 6 # custom alert channel: telegram, slack ... alert: kind: telegram conn_id: fin_alert # force connection_id for a team conns: - conn_id: gcp_team_2 replace_fields: - bigquery_conn_id - gcp_conn_id - google_cloud_storage_conn_id - google_cloud_conn_id Với config như trên thì biết đọc yaml ở folder nào, và thế là mình đã nghĩ ra cách đơn giản là phải bắt buộc các file yaml phải được đặt vào thư mục với name tương ứng. Ví dụ (dags/finances)\nĐến đây chỉ việc viết 1 script python sương sương duyệt folder, parse yaml và:\n Gắn failed_callback tương với alert connection_id. Nếu match replace_fields thì tiến hành thay thế luôn. Về roles: Sau khi nghiên cứu thì mình phát hiện Airflow sử dụng flask-appbuilders, dẫn đến chỉ cần viết 1 câu SQL nhỏ nhỏ để insert quyền read vào bảng ab_permission_view_role với dag_id là đủ xài (Hack nhé, cẩn thận sập =]])  Kết luận WorkFlow  Update SQL, thêm step git commit -m \"fix things\" git push Pull Request \u0026 Merge - Hệ thống sẽ validate, gắn các alert khi dag failed, tự động retry, … Done  Ưu điểm  Tiết kiệm thời gian. Với cách viết mới, bây giờ mọi người đều có thể dễ dàng viết pipeline riêng cho mình. Thậm chí có thể viết thêm task ML training, prediction các thứ. Không tốn quá nhiều thời gian để debug, vì nếu dag không đúng format thì đã có alert ngay lập tức. Declarative \u0026 Abstraction: Users không cần phải biết quá chi tiết về mỗi operator có những gì, chỉ cần điền những field đủ để run (tất nhiên vẫn cần phải đủ flexible để có thể tùy biến khi cần thiết) Tự động gắn alert khi dag failed. (Mà đối với python phải import tay vào từng DAG). Dễ cho việc upgrade airflow: Bây giờ việc upgrade airflow không còn là ám ảnh.  Nếu airflow đổi import path ⇒ mình chỉ cần tạo đổi module path trong bảng operators là xong. Nếu airflow đổi field name, mình tạo 1 operator adapter và trỏ module path tới operator mình vừa tạo. Life’s so easy.   Tự động phân quyền:  Thực tế ở TIKI có khá nhiều team, \u0026 mỗi team muốn dag nhà ai nấy ở. Vì vậy mình đã chia mỗi team 1 có 1 folder riêng trong git, hoặc thậm chí là 1 git repo riêng luôn, có role riêng. Mỗi khi gen dag thành công, thì cũng sẽ auto update role tương ứng cho dag đó.    FAQ 1. Tại sao không làm UI cho anh em kéo thả luôn cho tiện ? Cái này hay nè, đợi bạn vào contribute đó (check JD nha)\nThực tế biết về git \u0026 version control nói là một điểm mạnh rất lớn cho các bạn analytics, thậm chí cả BA. Vì vậy mình quyết định vẫn giữ git làm nơi lưu giữ các file yaml trên.\n2 ưu điểm lớn của version control:\n Theo dõi được thay đổi từ lúc một file được sinh ra: ai đổi, đổi vì lý do gì. Nếu có biến gì đều có thể quay về phiên bản ổn định nhất. Và sau đó blame người phát =]]. Cho phép nhiều người cùng làm việc chung với nhau trên 1 project, thậm chí là 1 file.  2. 500 anh em xài chung 1 con airflow, có bị kẹt phà giờ cao điểm không chú? Về mặt thiết kế hệ thống, ngay từ đầu mình chọn kubernetes \u0026 cài đặt để nó có thể tự động nâng thêm resources \u0026\u0026 chọn nodes khác nhau khi có nhiều job chạy (autoscaler). Thực tế mình ghi nhận được có lúc đạt 600 jobs chạy đồng thời.\nThậm chí là chọn được nodes mạnh để run các job tốn nhiều resources:\n Ví dụ training model thì chạy trên con vài chục CPU. Những job đơn giản như chỉ run SQL thì chạy nodes nhỏ hơn.  Những cái này hoàn toàn tự động \u0026 anh em không cần phải làm gì thêm.\n(Autoscaling \u0026 Distributed đấy =]])\nCần cải tiến. Những thiết kế này chỉ là bước đầu, còn rất nhiều room để cải thiện thêm, 1 case rất điển hình như: Kéo thả dags nì: Thay vì phải ngồi viết yaml, cực nhọc học git, chỉ việc lên UI kéo thả các thứ \u0026 Tạo ngay 1 dags cho mình.\nResources Những thiết kế này mình đã hoàn thành vào 2019, nhưng mà idea của nó mình vừa gặp lại 2 ở 2 bài viết khá hay.\n Data Engineers Shouldn’t Write Airflow Dags Data Engineers Shouldn’t Write Airflow Dags - Part 2  1 phút quảng cáo\n Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất. Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build \u0026 publish cho hơn 500 anh em TIKI xài.  Đến ngay với team data nhé: JD đây nè (Hoặc gửi CV vào mail mình hien.pham2@tiki.vn)\n",
+  "wordCount" : "1698",
+  "inLanguage": "vi",
+  "datePublished": "2021-08-31T00:00:00Z",
+  "dateModified": "2021-08-31T15:09:24+07:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "haongo.me/posts/airflow-dags-the-right-way/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TheAmazingLab",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "haongo.me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: #1d1e20;
+                --entry: #2e2e33;
+                --primary: rgba(255, 255, 255, 0.84);
+                --secondary: rgba(255, 255, 255, 0.56);
+                --tertiary: rgba(255, 255, 255, 0.16);
+                --content: rgba(255, 255, 255, 0.74);
+                --hljs-bg: #2e2e33;
+                --code-bg: #37383e;
+                --border: #333;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="haongo.me" accesskey="h" title="TheAmazingLab (Alt + H)">TheAmazingLab</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="haongo.me/categories/engineerings/" title="Engineering Wikis">
+                    <span>Engineering Wikis</span>
+                </a>
+            </li>
+            <li>
+                <a href="haongo.me/categories/financials/" title="Financial stubs">
+                    <span>Financial stubs</span>
+                </a>
+            </li>
+            <li>
+                <a href="haongo.me/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.topcv.vn/xem-cv/BwdWUQ9VAQoDD1VXXVECAFdRVgEAAAUFAANXVg80fc" title="Author&#39;s Profile">
+                    <span>Author&#39;s Profile</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="haongo.me">Trang chủ</a>&nbsp;»&nbsp;<a href="haongo.me/posts/">Bài viết</a></div>
+    <h1 class="post-title">
+      Airflow Dags The Right Way
+    </h1>
+    <div class="post-meta">August 31, 2021&nbsp;·&nbsp;8 phút
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Mục lục</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#b%e1%bb%91i-c%e1%ba%a3nh" aria-label="Bối cảnh">Bối cảnh</a></li>
+                <li>
+                    <a href="#research" aria-label="Research">Research</a><ul>
+                        
+                <li>
+                    <a href="#lets-start-" aria-label="Let&amp;rsquo;s start !"><strong>Let&rsquo;s start !</strong></a></li>
+                <li>
+                    <a href="#ph%c3%a2n-quy%e1%bb%81n" aria-label="Phân Quyền">Phân Quyền</a></li></ul>
+                </li>
+                <li>
+                    <a href="#k%e1%ba%bft-lu%e1%ba%adn" aria-label="Kết luận">Kết luận</a><ul>
+                        
+                <li>
+                    <a href="#workflow" aria-label="WorkFlow"><strong>WorkFlow</strong></a></li>
+                <li>
+                    <a href="#%c6%b0u-%c4%91i%e1%bb%83m" aria-label="Ưu điểm"><strong>Ưu điểm</strong></a></li>
+                <li>
+                    <a href="#faq" aria-label="FAQ">FAQ</a><ul>
+                        
+                <li>
+                    <a href="#1-t%e1%ba%a1i-sao-kh%c3%b4ng-l%c3%a0m-ui-cho-anh-em-k%c3%a9o-th%e1%ba%a3-lu%c3%b4n-cho-ti%e1%bb%87n-" aria-label="1. Tại sao không làm UI cho anh em kéo thả luôn cho tiện ?">1. Tại sao không làm UI cho anh em kéo thả luôn cho tiện ?</a></li>
+                <li>
+                    <a href="#2-500-anh-em-x%c3%a0i-chung-1-con-airflow-c%c3%b3-b%e1%bb%8b-k%e1%ba%b9t-ph%c3%a0-gi%e1%bb%9d-cao-%c4%91i%e1%bb%83m-kh%c3%b4ng-ch%c3%ba" aria-label="2. 500 anh em xài chung 1 con airflow, có bị kẹt phà giờ cao điểm không chú?">2. 500 anh em xài chung 1 con airflow, có bị kẹt phà giờ cao điểm không chú?</a></li></ul>
+                </li>
+                <li>
+                    <a href="#c%e1%ba%a7n-c%e1%ba%a3i-ti%e1%ba%bfn" aria-label="Cần cải tiến.">Cần cải tiến.</a></li></ul>
+                </li>
+                <li>
+                    <a href="#resources" aria-label="Resources">Resources</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><strong>TLDR;</strong></p>
+<p>Sau khi gặp khá nhiều vấn đề với lượng lớn python DAG khi upgrade, viết giúp dag &amp; sau một thời gian thành con rơi, không ai maintain nữa.</p>
+<p>Mình tin rằng nhất định có một cách viết dags khác:</p>
+<ul>
+<li>Đơn giản &amp; hiệu quả hơn thế</li>
+<li>500 anh em BA, Analytics có thể dễ dàng tự viết pipelines cho riêng mình mà không phải tốn quá nhiều công sức</li>
+<li>Dễ dàng cho việc monitor, alerting khi có biến xảy ra</li>
+<li>Upgrade core của airflow không cần phải thay đổi các dags config hiện tại.</li>
+</ul>
+<p><strong>Ké vài miếng quảng cáo</strong></p>
+<ul>
+<li>Bạn đang mong muốn tìm kiếm cơ hội mới</li>
+<li>Bạn muốn làm việc với những công nghệ big data tối tân nhất.</li>
+<li>Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build &amp; publish cho hơn 500 anh em TIKI xài.</li>
+</ul>
+<p>Đến ngay với team data nhé: <a href="https://tuyendung.tiki.vn/job/senior-data-engineer-data-platform-2082">JD đây nè</a> (Hoặc gửi CV vào mail mình <a href="mailto:hien.pham2@tiki.vn">hien.pham2@tiki.vn</a>)</p>
+<h1 id="bối-cảnh">Bối cảnh<a hidden class="anchor" aria-hidden="true" href="#bối-cảnh">#</a></h1>
+<p>Bài viết này là cách mình thiết kế &amp; tổ chức config cho airflow (trước thềm đú trend lên cloud).</p>
+<p>Nếu bạn đam mê về technical, tham khảo bài viết <a href="https://www.hienph.dev/posts/apache-airflow/">Path to airflow 2 ở TIKI</a> nhé.</p>
+<p>Những vấn đề đối với cách viết dags hiện tại:</p>
+<ul>
+<li>Những chuổi ngày copy - paste lăp đi lặp lại (nghe giống DRY - Don&rsquo;t Repeat Your Self Principle không).</li>
+<li>Nếu không được tổ chức đúng cách, reviews kỹ lưỡng có thể dẫn đến con đường đập đi xây lại một ngày không xa (duplicated and unmaintainable code).</li>
+<li>Non - tech users (các bạn analytics, BA &hellip;) phải tốn thời gian học python, cách import module như thế nào cho đúng. Điều này dẫn đến một lúc nào đó các chú culi 4.0 (aka data engineer) phải ngồi viết dùm dags cho các em xinh đẹp =)) (Cho chừa tội mê gái)</li>
+<li>We can do better!</li>
+</ul>
+<p>Thế là nông dân quyết tâm thiết kế một cách viết riêng để có thể viết dag một cách ổn định nhất nhất, kể cả khi core của airflow thay đổi (ví dụ import path thay đổi, params thay đổi &hellip;)</p>
+<h1 id="research">Research<a hidden class="anchor" aria-hidden="true" href="#research">#</a></h1>
+<p>(Lúc này là tháng 09/2019) Mình bắt đầu thử với các keywords: <code>dag config</code>, <code>dag factory</code>, <code>dag yaml</code>, &hellip;</p>
+<p>Research 1 hồi thì tìm được <a href="https://github.com/ajbosco/dag-factory">dag-factory opensource</a>, tương lai đây rồi.</p>
+<p>Với dag-factory thì có 1 số vấn đề mình cần giải quyết:</p>
+<ul>
+<li>users vẫn phải input full cái import path cho operator → Cần pải tạo alias name
+<ul>
+<li>Ví dụ <code>airflow.operators.bash_operator.BashOperator</code> → <code>BashOperator</code></li>
+</ul>
+</li>
+<li>Chỉ cần input những thông tin quan trong.
+<ul>
+<li>vd với operator <code>airflow.contrib.operators.bigquery_operator.BigQueryOperator</code> chỉ cần truyền vào: <code>sql</code> , <code>destination_dataset_table</code>. Không cần phải truyền thêm <code>gcp_conn_id</code>, cái option như <code>create_disposition</code>, <code>write_disposition</code></li>
+</ul>
+</li>
+<li>Tự động phân quyền dags &amp; set connection_id tương ứng cho mỗi team.
+<ul>
+<li>vd team 1 thì dùng <code>bigquery_conn_id=team1</code>, dù users có truyền connection_id thì vẫn phải override ở code.</li>
+</ul>
+</li>
+<li>Cần phải force một số conventions:
+<ul>
+<li>Mỗi team sẽ có 1 prefix riêng, tiện cho việc phân biệt.</li>
+<li>Tên file = tên dag → Dễ debug khi có biến.</li>
+</ul>
+</li>
+</ul>
+<p>⇒ Phải đổi một xíu cái lib dag factory này.</p>
+<h2 id="lets-start-"><strong>Let&rsquo;s start !</strong><a hidden class="anchor" aria-hidden="true" href="#lets-start-">#</a></h2>
+<p>Với những tinh hoa được học từ thanh niên cứng (SOLID), Open for Extension, Closed For Modification. Giờ không đuợc thay đổi code của <code>dag-factory</code> mà mình sẽ extend nó.</p>
+<p>Tức là thay vì vào edit code để support gắn <code>conn_id</code>, <code>operator alias</code> thì mình sẽ tạo thêm 1 layer phía trên và tiến hành convert nó đúng với format mà <code>dag-factory</code> cần.</p>
+<p>Bắt đầu với thiết kế alias cho <code>operators</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OperatorAlias</span>:
+    <span style="color:#75715e"># alias name: BigQueryOperator</span>
+    name: str
+
+    <span style="color:#75715e"># full module path: airflow.providers.google.cloud.operators.bigquery.BigQueryExecuteQueryOperator</span>
+    module: str
+
+    <span style="color:#75715e"># json schema, use for validate the user inputs.</span>
+    <span style="color:#75715e"># {&#34;type&#34;: &#34;object&#34;, &#34;properties&#34;: {&#34;sql&#34;: {&#34;type&#34;: &#34;string&#34;, &#34;minLength&#34;: 2 }}, &#34;required&#34;: [&#34;sql&#34;]}</span>
+    schema: dict
+
+    <span style="color:#75715e"># set the default params like connections ...</span>
+    <span style="color:#75715e"># {&#34;bigquery_conn_id&#34;: &#34;gcp_girls&#34;, &#34;allow_large_results&#34;: true, ...}</span>
+    default_params: dict
+</code></pre></div><p>Với thiết kế 1 alias như trên, bây giờ thay vì phải viết một file python như thế này</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+<span style="color:#f92672">from</span> airflow <span style="color:#f92672">import</span> DAG
+<span style="color:#f92672">from</span> airflow.providers.google.cloud.operators.bigquery <span style="color:#f92672">import</span> BigQueryExecuteQueryOperator
+<span style="color:#f92672">from</span> .. <span style="color:#f92672">import</span> BigQueryTableToOLAPOperator
+
+default_args <span style="color:#f92672">=</span> {
+    <span style="color:#e6db74">&#39;owner&#39;</span>: <span style="color:#e6db74">&#39;my@names.com&#39;</span>,
+}
+<span style="color:#66d9ef">with</span> DAG(
+    <span style="color:#e6db74">&#39;tutorial&#39;</span>,
+    default_args<span style="color:#f92672">=</span>default_args,
+    schedule_interval<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;0 3 * * *&#39;</span>,
+    tags<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;dwh&#39;</span>,<span style="color:#e6db74">&#39;etl&#39;</span>],
+) <span style="color:#66d9ef">as</span> dag:
+    t1 <span style="color:#f92672">=</span> BigQueryExecuteQueryOperator(
+        task_id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ext_girls&#39;</span>,
+        sql<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;SELECT * FROM girls WHERE age &gt;= 18 and age &lt;= 30&#39;</span>,
+        destination_dataset_table<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;tiktok_clone.girls_available&#39;</span>,
+        gcp_conn_id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gcp_girls&#39;</span>,
+        create_disposition<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;CREATE_IF_NEEDED&#34;</span>,
+        write_disposition<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;WRITE_TRUNCATE&#34;</span>,
+        allow_large_results<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+    )
+    t2 <span style="color:#f92672">=</span> BigQueryTableToOLAPOperator(
+        task_id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;sync_to_olap&#39;</span>,
+        table<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;tiktok_clone.girls_available&#39;</span>,
+        gcp_conn_id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gcp_girls&#39;</span>,
+        druid_conn_id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;k8s_druid&#39;</span>,
+        date_column<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;date&#39;</span>,
+    )
+    t1 <span style="color:#f92672">&gt;&gt;</span> t2
+</code></pre></div><p>Chỉ cần viết 1 file yaml.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#75715e"># ext_available_girls.yaml</span>
+<span style="color:#f92672">default_args</span>:
+  <span style="color:#f92672">owner</span>: <span style="color:#e6db74">&#39;my@names.com&#39;</span>
+<span style="color:#f92672">schedule_interval</span>: <span style="color:#e6db74">&#39;0 3 * * *&#39;</span>
+<span style="color:#f92672">tags</span>:
+  - <span style="color:#ae81ff">dwh</span>
+  - <span style="color:#ae81ff">etl</span>
+<span style="color:#f92672">tasks</span>:
+  <span style="color:#f92672">ext_girls</span>:
+    <span style="color:#f92672">operator</span>: <span style="color:#ae81ff">BigQueryOperator</span>
+    <span style="color:#f92672">sql</span>: <span style="color:#e6db74">&#39;SELECT * FROM girls WHERE age &gt;= 18 and age &lt;= 30&#39;</span>
+    <span style="color:#f92672">destination_dataset_table</span>: <span style="color:#ae81ff">tiktok_clone.girls_available</span>
+  <span style="color:#f92672">sync_to_olap</span>:
+    <span style="color:#f92672">operator</span>: <span style="color:#ae81ff">BigQueryTableToOLAPOperator</span>
+    <span style="color:#f92672">table</span>: <span style="color:#ae81ff">tiktok_clone.girls_available</span>
+    <span style="color:#f92672">druid_destination_table</span>: <span style="color:#ae81ff">girls_available</span>
+    <span style="color:#f92672">dependencies</span>:
+      - <span style="color:#ae81ff">ext_girls</span>
+</code></pre></div><p>Xịn rồi, coi ngày &amp; deploy thôi anh em ơi.</p>
+<h2 id="phân-quyền">Phân Quyền<a hidden class="anchor" aria-hidden="true" href="#phân-quyền">#</a></h2>
+<p>PoC (Proof of Concept) cơ bản đã hoạt động được, tiếp theo cần phải giải quyết vấn đề tự động phân quyền &amp; set các connections for mỗi team.</p>
+<p>Mỗi team sẽ có 1 role riêng, các DAG sẽ được gắn quyền read trên role này.</p>
+<p>Ý tưởng ban đần là mỗi team sẽ có role riêng, các connection_id, &amp; alert connection_id riêng luôn.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">teams</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">finances</span>
+    <span style="color:#75715e"># airflow role_id</span>
+    <span style="color:#f92672">role_id</span>: <span style="color:#ae81ff">6</span>
+    <span style="color:#75715e"># custom alert channel: telegram, slack ...</span>
+    <span style="color:#f92672">alert</span>:
+      <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">telegram</span>
+      <span style="color:#f92672">conn_id</span>: <span style="color:#ae81ff">fin_alert</span>
+    <span style="color:#75715e"># force connection_id for a team</span>
+    <span style="color:#f92672">conns</span>:
+      - <span style="color:#f92672">conn_id</span>: <span style="color:#ae81ff">gcp_team_2</span>
+        <span style="color:#f92672">replace_fields</span>:
+          - <span style="color:#ae81ff">bigquery_conn_id</span>
+          - <span style="color:#ae81ff">gcp_conn_id</span>
+          - <span style="color:#ae81ff">google_cloud_storage_conn_id</span>
+          - <span style="color:#ae81ff">google_cloud_conn_id</span>
+</code></pre></div><p>Với config như trên thì biết đọc yaml ở folder nào, và thế là mình đã nghĩ ra cách đơn giản là phải <strong>bắt buộc các file yaml phải được đặt vào thư mục với <code>name</code> tương ứng</strong>. Ví dụ (<code>dags/finances</code>)</p>
+<p>Đến đây chỉ việc viết 1 script python sương sương duyệt folder, parse yaml và:</p>
+<ul>
+<li>Gắn <code>failed_callback</code> tương với alert connection_id.</li>
+<li>Nếu match <code>replace_fields</code> thì tiến hành thay thế luôn.</li>
+<li>Về roles: Sau khi nghiên cứu thì mình phát hiện Airflow sử dụng flask-appbuilders, dẫn đến chỉ cần viết 1 câu SQL nhỏ nhỏ để insert quyền <code>read</code> vào bảng <code>ab_permission_view_role</code> với <code>dag_id</code> là đủ xài (Hack nhé, cẩn thận sập =]])</li>
+</ul>
+<h1 id="kết-luận">Kết luận<a hidden class="anchor" aria-hidden="true" href="#kết-luận">#</a></h1>
+<h2 id="workflow"><strong>WorkFlow</strong><a hidden class="anchor" aria-hidden="true" href="#workflow">#</a></h2>
+<ul>
+<li>Update SQL, thêm step</li>
+<li><code>git commit -m &quot;fix things&quot;</code></li>
+<li><code>git push</code></li>
+<li>Pull Request &amp; Merge -&gt; Hệ thống sẽ validate, gắn các alert khi dag failed, tự động retry, &hellip;</li>
+<li>Done</li>
+</ul>
+<h2 id="ưu-điểm"><strong>Ưu điểm</strong><a hidden class="anchor" aria-hidden="true" href="#ưu-điểm">#</a></h2>
+<ul>
+<li>Tiết kiệm thời gian.</li>
+<li>Với cách viết mới, bây giờ mọi người đều có thể dễ dàng viết pipeline riêng cho mình. Thậm chí có thể viết thêm task ML training, prediction các thứ.</li>
+<li>Không tốn quá nhiều thời gian để debug, vì nếu dag không đúng format thì đã có alert ngay lập tức.</li>
+<li><code>Declarative</code> &amp; <code>Abstraction</code>: Users không cần phải biết quá chi tiết về mỗi operator có những gì, chỉ cần điền những field đủ để run (tất nhiên vẫn cần phải đủ flexible để có thể tùy biến khi cần thiết)</li>
+<li>Tự động gắn alert khi dag failed. (Mà đối với python phải import tay vào từng DAG).</li>
+<li>Dễ cho việc upgrade airflow: Bây giờ việc upgrade airflow không còn là ám ảnh.
+<ul>
+<li>Nếu airflow đổi import path ⇒ mình chỉ cần tạo đổi module path trong bảng operators là xong.</li>
+<li>Nếu airflow đổi field name, mình tạo 1 operator adapter và trỏ module path tới operator mình vừa tạo.</li>
+<li>Life&rsquo;s so easy.</li>
+</ul>
+</li>
+<li>Tự động phân quyền:
+<ul>
+<li>Thực tế ở TIKI có khá nhiều team, &amp; mỗi team muốn dag nhà ai nấy ở.</li>
+<li>Vì vậy mình đã chia mỗi team 1 có 1 folder riêng trong git, hoặc thậm chí là 1 git repo riêng luôn,  có role riêng. Mỗi khi gen dag thành công, thì cũng sẽ auto update role tương ứng cho dag đó.</li>
+</ul>
+</li>
+</ul>
+<h2 id="faq">FAQ<a hidden class="anchor" aria-hidden="true" href="#faq">#</a></h2>
+<h3 id="1-tại-sao-không-làm-ui-cho-anh-em-kéo-thả-luôn-cho-tiện-">1. Tại sao không làm UI cho anh em kéo thả luôn cho tiện ?<a hidden class="anchor" aria-hidden="true" href="#1-tại-sao-không-làm-ui-cho-anh-em-kéo-thả-luôn-cho-tiện-">#</a></h3>
+<p>Cái này hay nè, đợi bạn vào contribute đó (check JD nha)</p>
+<p>Thực tế biết về <code>git</code> &amp; version control nói là một điểm mạnh rất lớn cho các bạn analytics, thậm chí cả BA. Vì vậy mình quyết định vẫn giữ <code>git</code> làm nơi lưu giữ các file yaml trên.</p>
+<p>2 ưu điểm lớn của version control:</p>
+<ul>
+<li>Theo dõi được thay đổi từ lúc một file được sinh ra: ai đổi, đổi vì lý do gì. Nếu có biến gì đều có thể quay về phiên bản ổn định nhất. Và sau đó blame người phát =]].</li>
+<li>Cho phép nhiều người cùng làm việc chung với nhau trên 1 project, thậm chí là 1 file.</li>
+</ul>
+<h3 id="2-500-anh-em-xài-chung-1-con-airflow-có-bị-kẹt-phà-giờ-cao-điểm-không-chú">2. 500 anh em xài chung 1 con airflow, có bị kẹt phà giờ cao điểm không chú?<a hidden class="anchor" aria-hidden="true" href="#2-500-anh-em-xài-chung-1-con-airflow-có-bị-kẹt-phà-giờ-cao-điểm-không-chú">#</a></h3>
+<p>Về mặt thiết kế hệ thống, ngay từ đầu mình chọn kubernetes &amp; cài đặt để nó có thể tự động nâng thêm resources &amp;&amp; chọn nodes khác nhau khi có nhiều job chạy (autoscaler). Thực tế mình ghi nhận được có lúc đạt <strong>600 jobs</strong> chạy đồng thời.</p>
+<p>Thậm chí là chọn được nodes mạnh để run các job tốn nhiều resources:</p>
+<ul>
+<li>Ví dụ training model thì chạy trên con vài chục CPU.</li>
+<li>Những job đơn giản như chỉ run SQL thì chạy nodes nhỏ hơn.</li>
+</ul>
+<p>Những cái này hoàn toàn tự động &amp; anh em không cần phải làm gì thêm.</p>
+<p>(Autoscaling &amp; Distributed đấy =]])</p>
+<h2 id="cần-cải-tiến">Cần cải tiến.<a hidden class="anchor" aria-hidden="true" href="#cần-cải-tiến">#</a></h2>
+<p>Những thiết kế này chỉ là bước đầu, còn rất nhiều room để cải thiện thêm, 1 case rất điển hình như: Kéo thả dags nì: Thay vì phải ngồi viết yaml, cực nhọc học git, chỉ việc lên UI kéo thả các thứ &amp; Tạo ngay 1 dags cho mình.</p>
+<h1 id="resources">Resources<a hidden class="anchor" aria-hidden="true" href="#resources">#</a></h1>
+<p>Những thiết kế này mình đã hoàn thành vào 2019, nhưng mà idea của nó mình vừa gặp lại 2 ở 2 bài viết khá hay.</p>
+<ul>
+<li><a href="https://towardsdatascience.com/data-engineers-shouldnt-write-airflow-dags-b885d57737ce">Data Engineers Shouldn&rsquo;t Write Airflow Dags</a></li>
+<li><a href="https://towardsdatascience.com/data-engineers-shouldnt-write-airflow-dags-part-2-8dee642493fb">Data Engineers Shouldn&rsquo;t Write Airflow Dags - Part 2</a></li>
+</ul>
+<p><strong>1 phút quảng cáo</strong></p>
+<ul>
+<li>Bạn đang mong muốn tìm kiếm cơ hội mới</li>
+<li>Bạn muốn làm việc với những công nghệ big data tối tân nhất.</li>
+<li>Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build &amp; publish cho hơn 500 anh em TIKI xài.</li>
+</ul>
+<p>Đến ngay với team data nhé: <a href="https://tuyendung.tiki.vn/job/senior-data-engineer-data-platform-2082">JD đây nè</a> (Hoặc gửi CV vào mail mình <a href="mailto:hien.pham2@tiki.vn">hien.pham2@tiki.vn</a>)</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="haongo.me/tags/airflow/">airflow</a></li>
+      <li><a href="haongo.me/tags/data_engineering/">data_engineering</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="haongo.me/posts/apache-airflow/">
+    <span class="title">Trang tiếp theo »</span>
+    <br>
+    <span>Path to airflow 2</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Airflow Dags The Right Way on twitter"
+        href="https://twitter.com/intent/tweet/?text=Airflow%20Dags%20The%20Right%20Way&amp;url=haongo.me%2fposts%2fairflow-dags-the-right-way%2f&amp;hashtags=airflow%2cdata_engineering">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Airflow Dags The Right Way on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=haongo.me%2fposts%2fairflow-dags-the-right-way%2f&amp;title=Airflow%20Dags%20The%20Right%20Way&amp;summary=Airflow%20Dags%20The%20Right%20Way&amp;source=haongo.me%2fposts%2fairflow-dags-the-right-way%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Airflow Dags The Right Way on reddit"
+        href="https://reddit.com/submit?url=haongo.me%2fposts%2fairflow-dags-the-right-way%2f&title=Airflow%20Dags%20The%20Right%20Way">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Airflow Dags The Right Way on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=haongo.me%2fposts%2fairflow-dags-the-right-way%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Airflow Dags The Right Way on whatsapp"
+        href="https://api.whatsapp.com/send?text=Airflow%20Dags%20The%20Right%20Way%20-%20haongo.me%2fposts%2fairflow-dags-the-right-way%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Airflow Dags The Right Way on telegram"
+        href="https://telegram.me/share/url?text=Airflow%20Dags%20The%20Right%20Way&amp;url=haongo.me%2fposts%2fairflow-dags-the-right-way%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2021 <a href="haongo.me">TheAmazingLab</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+    menu.onscroll = function () {
+        localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = 'Sao chép';
+
+        function copyingDone() {
+            copybutton.innerText = 'Đã sao chép!';
+            setTimeout(() => {
+                copybutton.innerText = 'Sao chép';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

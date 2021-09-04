@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Path to airflow 2 | TheAmazingLab</title>
+<meta name="keywords" content="airflow, data_infra, data_engineering" />
+<meta name="description" content="Airflow in the nut shell:
+ Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò. Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job  Ví dụ như là select vào rows từ MySQL Thêm ít gia vị (Cooking) Load vào Datawarehouse    Ké vài miếng quảng cáo
+ Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất.">
+<meta name="author" content="">
+<link rel="canonical" href="haongo.me/posts/apache-airflow/" />
+<link crossorigin="anonymous" href="/haongo.me/assets/css/stylesheet.min.9f1d947375927e9847272b1f4e9be81336f539e513bf04d52cade31f81cad1af.css" integrity="sha256-nx2Uc3WSfphHJysfTpvoEzb1OeUTvwTVLK3jH4HK0a8=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/haongo.me/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js" integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5&#43;kdJvBz5iKbt6B5PJI="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="haongo.me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="haongo.me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="haongo.me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="haongo.me/apple-touch-icon.png">
+<link rel="mask-icon" href="haongo.me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.88.0" />
+<meta property="og:title" content="Path to airflow 2" />
+<meta property="og:description" content="Airflow in the nut shell:
+ Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò. Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job  Ví dụ như là select vào rows từ MySQL Thêm ít gia vị (Cooking) Load vào Datawarehouse    Ké vài miếng quảng cáo
+ Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="haongo.me/posts/apache-airflow/" /><meta property="og:image" content="/haongo.me/posts/apache-airflow/images/feature-airflow_arch.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-08-22T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-08-20T18:09:24&#43;07:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="/haongo.me/posts/apache-airflow/images/feature-airflow_arch.png"/>
+<meta name="twitter:title" content="Path to airflow 2"/>
+<meta name="twitter:description" content="Airflow in the nut shell:
+ Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò. Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job  Ví dụ như là select vào rows từ MySQL Thêm ít gia vị (Cooking) Load vào Datawarehouse    Ké vài miếng quảng cáo
+ Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bài viết",
+      "item": "haongo.me/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Path to airflow 2",
+      "item": "haongo.me/posts/apache-airflow/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Path to airflow 2",
+  "name": "Path to airflow 2",
+  "description": "Airflow in the nut shell:\n Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò. Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job  Ví dụ như là select vào rows từ MySQL Thêm ít gia vị (Cooking) Load vào Datawarehouse    Ké vài miếng quảng cáo\n Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất.",
+  "keywords": [
+    "airflow", "data_infra", "data_engineering"
+  ],
+  "articleBody": "Airflow in the nut shell:\n Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò. Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job  Ví dụ như là select vào rows từ MySQL Thêm ít gia vị (Cooking) Load vào Datawarehouse    Ké vài miếng quảng cáo\n Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất. Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build \u0026 publish cho hơn 500 anh em TIKI xài.  Đến ngay với team data nhé: JD đây nè\nMới vào nghề Team Data Platform của Tiki sử dụng Apache Airflow từ những ngày đầu lập team từ năm 2017. Cho tới hôm nay kiến trúc \u0026 cách sử dụng airflow cũng thay đổi khá đáng kể. Bài viết này sẽ chia sẽ cách mà Team Data của dụng airflow, ưu nhược điểm của các cách dùng.\nNgày xửa ngày xưa.\nKhi mình vào TIKI vào T9/2018, một lần được cho vào con airflow chính, một cách ngây thơ updates 1 packages.\n# TLDR: # virtualenv python 2 \u0026 airflow 1.8 pip install --upgrade pandas-gbq supervisorctl restart all exit Sau đó tắt máy đi ngủ, tới chiều anh em ping nhau, Airflow ra đi rồi các bác ạ, Rì pọt ra đi hết rồi ông giáo ạ. Nghe xong tè ra quần luôn.\nMistakes:\n Không backup virtualenv trước khi run pip install  Nông dân tập thành cloud 1 năm sau (T9/2019)\nThời điểm này TIKI migrate từ Data Center lên (GCP) Google Cloud Platform. Thế là phải chuẩn bị bưng hệ thống một lần nữa.\nỞ thời điểm này có 3 con airflow đang chạy:\n 1 con chạy jobs ETL (Airflow 1.8) 1 con chạy sync snapshot từ MySQL/Postgres lên BigQuery (Airflow 1.8)  Nghĩ, giờ lên cloud mà xài công nghệ out date thì nông dân quá. Quyết tâm chơi lớn cài airflow latest luôn. DAG thì chắc chỉ cần copy qua là xong, không vỡ gì âu.\nĐược cấp 1 con VM mới trên GCP \u0026 ssh vào pip install liền.\nĐang đợi thì tự tát cái bếp. Học Infras As Code các thứ rồi mà lại tay chân thế. Thế là ngồi viết ansible để cài airflow =)). Pip install thì vài phút, ngồi viết mất vài tiếng.\nCopy dag nào thì dags đó vỡ\n Phát hiện ra là import path \u0026 params đã thay đổi khá nhiều từ 1.8 lên 1.10. (Lúc này còn ngây thơ mà) Hành ngập mặt rồi, kiểu này migrate chắc tới tết, trong khi anh em lúc đó còn 15 ngày để cutdown.  Ngồi nghĩ nghĩ, mếu được, thế này sau này kiểu gì cũng sẽ gặp case tương tự.\nLúc này sau 1 thời gian được rèn luyện ansible và tập làm văn kubernetes manifests bắt đầu có ý tưởng chế 1 yaml để viết config \u0026 build nó thành dag.\nXem bài viết nà\nTLDR:\n Mình viết thêm 1 lớp để set default (giá trị mặc định của các field), tên Operator ngắn gọn xúc tích thay vì phải import 1 path dài ngoằn. Tự động phân quyền cho dag, alert callback vào slack/telegram khi dag failed. Mỗi team có 1 folder riêng trong git hoặc thích thì cho hăn luôn 1 git repo riêng.  Tiếp theo là giờ sẽ deploy ở đâu đây?\nTuy là nông dân nhưng vẫn rất thích đú trend Cờ lâu nây típ (Cloud Native) thế là bắt tay vào nghiên cứu để chạy trên kubernetes luôn.\n CeleryExecutor: có sẵn helm chart airflow để cài. Tuy nhiên lại gặp vấn đề là chúng ta phải tạo trước workers \u0026 việc tự động scale cũng không dễ dàng gì. KubernetesExecutor: có thể tự động tạo Pod để run task mà không cần phải tạo worker trước. Nếu executor này kết với với autoscaler \u0026 Preemtible Pool của gke thì tuyệt vời ông mặt zời. Chốt nhanh chốt nhanh.  Nghiên cứu vài này thì cũng bắt đầu vào thiết kế \u0026 bắt tay vào viết k8s manifest.\nNhững tiêu chí khi deploy airflow trên k8s.\n Phải tiết kiệm: bằng cách tự scale node khi cần (điều này thì autoscalercủa gke đã làm rất tốt. Một cách khác mình nghĩ tới là sử dụng Preemptible VM của GCP: Với loại VM này thì thời gian tối đa của là 24h sau khi được tạo. Google có thể lấy lại (reclaim) bất kì thời điểm nào.  Với những yêu cầu như trên thì mình thiết kế các deployment riêng như sau:\n Scheduler: Core của toàn hệ thống nên phải cực kì stable, nên mình quyết định chọn node standard. (Core chết thì cậu vàng cũng phải bán đi mới mua bánh mì ăn được). Webserver thành 1 deployment riêng (run trên preemtible pool) để tiết kiệm và để HA thì mình tăng ≥ 2 replicas + podAntiAffinity topology là kubernetes.io/hostname. Pod được tạo ra từ airflow scheduler mình set mặc định chạy qua preemtible pool (tiết kiếm tiền để mua bánh mì) \u0026 tất nhiên là có hidden option để select node khác khi cần.  Về docker image: Thời điểm này airflow chưa có official image và community docker vẫn còn thiếu nhiều thứ. Mình quyết định viết riêng 1 dockerfile \u0026 đưa vào những dependencies cần thiết đủ để airflow chạy được.\nSau khi đủ các nguyên vật liệu thì bắt đầu lên đồ thôi.\nNgoài cách deploy airflow thì còn những bài toán sau cần giải quyết\nCost Saving vs Stable\n Để đảm bảo task chạy ổn định trên Preemtible VM, cần phải bật auto retry cho toàn dag trên hệ thống (việc này cực kì đơn giản nhờ vào config engine).  Lưu file yaml ở đâu?\n Việc sử dụng 1 file config riêng, mình hoàn toàn có thể support một giao diện để viết config hoặc fancy hơn là kéo thả. Nhưng nghĩ đi nghĩ lại thì build 1 UI như vậy khá tốn thời gian \u0026 lại phát sinh thêm phải handle conflict khi nhiều người cùng sửa 1 dag. Vì vậy mình đã force mọi người dùng Git. Code yaml sẽ được sync vào deployment Dag Importer, ở đây yaml sẽ được validate \u0026 convert thành python DAG file. Sau khi có file DAG, tới vấn đề tiếp theo.  Lưu dag ở đâu?\n Lưu thẳng trong images: có nhược điểm là phải build image liên tục khi có thay đổi → Khó optimize được Pod startup time do phải check Pull Image. Build docker có 1 nhược điểm là khá chậm. Lưu ở Shared Stores: Hiện gại Persistent Disk của gke chưa support Read Write Many , điều này dẫn đến phải sử dụng NFS. IOPS của NFS cực kỳ thấp so với SSD. Việc chọn storage nào phụ thuộc rất nhiều vào kiến trúc của airflow: Sau khi nghiên cứu 1 hồi thì mình nhận thấy là airflow sẽ serialized dag vào database, webserver \u0026 các worker đều đọc từ database này.  ⇒ Vì vậy mình chọn shared storages: không ảnh hưởng nhiều tới thời gian chạy task, 1 ưu điểm nữa là nó đơn giản hơn architect của hệ thống.\nLogging như thế nào?\n Khi lên kubernetes option bắt buộc là phải chọn 1 remote logging (cụ thể thì mình chọn gcs để lưu) Nhưng remote logging gặp phải vấn đề là không xem được lúc task đang chạy. Dẫn đến mình phải workaround bằng cách sử dụng 1 file system tạm để lưu logs của task đang chạy. Còn đuờng nào ngoài NFS nữa đâu.  Authentication \u0026 Authorization\n Mình định hướng build Airflow trở thành 1 open platform, mọi người đều có thể viết config \u0026 chạy. Đối với định hướng như vậy, bắt buộc phải phân quyền thật kỹ \u0026 tốt nhất là ở DAG level. Cũng khá may là airflow support Oauth2 \u0026 cả access ở DAG level. Việc này trở nên khá đơn giản khi mà config system đã add sẵn DAG vào mỗi role.  Monitor \u0026 Alerting\n Với hệ thống config thì mình đã tự động gắn sẵn task_failed_callback. Mỗi team sẽ đuợc tạo 1 connection riêng (có thể là slack/telegram) \u0026 lúc failed thì dag nhà ai nấy nhận \u0026 tự đi check. Đối với airflow thì mình sử dụng Statsd Exporter để expose metrics API cho prometheus và lên grafana tạo dashboard/alert.  Backfill dags như thế nào?\n Ngày trước cái trên VM thì hay ssh vào server để chạy airflow backfill. Còn trên k8s thì ssh đâu mà vào. Vào pod để execute thì nó lại bị limit ở vài bạn engineer. Vì vậy mình đã custom lại 1 opensource là airflow-backfill-util \u0026 share quyền cho mọi người vào backfill.  Vài cảm nhận:\n NFS everywhere. Nói là Preemtible VM nhưng mình cảm nhận là khá là stable, sau 2 năm sử dụng thì mình chưa gặp vấn đề gì quá lớn (Có thể do thiết kế system pro quá nên không bị lỗi :\")  Lâu lâu có vài task chạy hơn 5h bị down, đối với những task này, mình question ngược lại tại sao nó lại chạy lâu thế →optimize DAG. Đối với Data Scientist Team: Mình white list cho viết hẵn Python code luôn, cho select node xịn để chạy. Chớ model train cũng hết nữa ngày.   Khi chạy airflow trên K8S thì Airflow không còn đơn thuần là chỉ ETL nữa, mà có thể chạy mọi thứ, thanks KubernetesPodOperator.  Hiện tại mình luôn khuyến khích các bạn Data Scientist thay vì viết PythonOperator \u0026 nhờ mình cài thêm dependencies vào base image, thì viết một Dockerfile chứ mọi thứ cần thiết ở trong đó (ML Libs, C++ Libs, Code …) \u0026 config KubernetesPodOperator. Việc này vừa đảm bảo tính ổn định, không cần phải add những thứ không cần thiết vào base images sẽ tốn time để pull → giảm startup time.    Airflow 2 Version 2.0 được release vào ngày 2020-12-18 thế nhưng mình chưa dám update ngay, vì trước giờ mỗi lần chỉ update patch version của airflow không què chổ này thì chổ kia. Mà lỗi gặp nhiều nhất vẫn là google oauth2, và phần lớn là do lỗi depedencies 😐.\nSau hơn 8h tháng delay thì quyết tâm làm 1 lần sau cuối.\nLên danh sách những việc cần làm:\n Coi ngày: chọn ngày tốt mới dám upgrade (check xemngay.com) Làm theo upgrade guides: https://airflow.apache.org/docs/apache-airflow/stable/upgrading-to-2.html  Lên airflow 1.10.15 Install backport provider \u0026 update module_path vào cái operators (đơn giản là update vào config của operator alias). Generate pod_template_file Run airflow upgrade_check \u0026 fix. Đa số lỗi mình gặp đến từ các DAG viết bằng python của team Data Scientist. Không còn cách nào khác là phải đi fix tay từng dag, cũng rất may là khoảng chưa tới 20 dags.    Sau khi lên bridges \u0026 chọn đuợc ngày lành tháng tốt. Bắt đầu upgrade airflow 2. Ở tiki thì đa số DAG được chạy vào ban đêm \u0026 buổi sáng. Riêng buổi chiều \u0026 tối thì rất ít. Thời điểm vàng là đây.\n  Backup Metadata DB: Viết tâm thư gửi anh em system để lỡ mà sự việc không thành, vẫn còn đừong quay về nhà.\n  Scale Down tất cả services: Scheduler, WebServer, ImportDags\n  Merge Pull Request để Build \u0026 Deploy.\n  Start 1 replica WebServer, execute bash \u0026 run: airflow db upgrade vừa ngồi vừa nghe nhạc để tự trấn an mình =)), chớ lúc đó cũng teo hết mọi thứ rồi.\n  Đợi khoàng 30 phút thì migrate run xong. Mình bắt đầu lên web ui để kiểm tra xem có bị vỡ gì không. Thấy mọi thứ có vẻ ổn.\n  Scale scheduler lên 1 replica. Thấy DAG mếu chạy, bắt đầu xanh cmn mặt.\n Không run được do entrypoint trong docker đã đuợc add sẵn airflow command. Sau đó args lại add thêm airflow nữa.    Sau khi fix lỗi command thì thấy DAG bắt đầu chạy: đi kiểm tra một vòng thì đa số DAG chạy ok, có một số lỗi vặt khá dị:\n env_vars của KubernetesPodOperator tự động nhận diện cái env bắt đầu bằng / thành template file → dẫn đến start pod lỗi. Bug nhọ nhất là admin không được edit user permissions nữa. Phải ngồi đợi bản fix tiếp theo thôi. Logging: Không còn sử dụng connection_id để lấy logging credention cho gcs mà phải mount credential vào pod. Một vài lỗi nhỏ khác do sử dụng internal function của airflow.    Vài cảm nhận về Airflow 2:\n Performance tăng khủng khiếp: Khi số lựợng DAG tăng lên từ vài trăm lên gần 2000, một vấn đề rất lớn gặp phải đối với airflow 1 là thời gian delay giữa các task trong dag rất lớn. Phải mất từ 5 - 15p giữa các task \u0026 thời gian start DAG delay khoàng 5 phút so với giờ được set. Khi lên version 2 thì gần như về 0. Điều này cực kỳ có ý nghĩa đối với những task chạy mỗi 1 hoặc 2 phút. UI mới nhìn đẹp hơn hẵn \u0026 thực tế là ai cũng khen (chê xấu là disable account nhé). Việc upgrade lần này êm hơn hẵn so với dự tính của mình là có thể không lên được  Vì mình thấy được qua các lần upgrade trước, vỡ rất nhiều chổ    Kết luận Còn chờ đợi gì mà không lên airflow 2 ngay và thôi. Mình đã upgrade thành công bạn cũng thế. Và nhớ coi ngày trước khi upgrade nha.\nỞ trên có quảng cáo rồi, nhưng mình vẫn cứ đăng lại\n Bạn đang mong muốn tìm kiếm cơ hội mới Bạn muốn làm việc với những công nghệ big data tối tân nhất. Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build \u0026 publish cho hơn 500 anh em TIKI xài.  Đến ngay với team data nhé: JD đây nè\n",
+  "wordCount" : "2329",
+  "inLanguage": "vi",
+  "datePublished": "2021-08-22T00:00:00Z",
+  "dateModified": "2021-08-20T18:09:24+07:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "haongo.me/posts/apache-airflow/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TheAmazingLab",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "haongo.me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: #1d1e20;
+                --entry: #2e2e33;
+                --primary: rgba(255, 255, 255, 0.84);
+                --secondary: rgba(255, 255, 255, 0.56);
+                --tertiary: rgba(255, 255, 255, 0.16);
+                --content: rgba(255, 255, 255, 0.74);
+                --hljs-bg: #2e2e33;
+                --code-bg: #37383e;
+                --border: #333;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="haongo.me" accesskey="h" title="TheAmazingLab (Alt + H)">TheAmazingLab</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="haongo.me/categories/engineerings/" title="Engineering Wikis">
+                    <span>Engineering Wikis</span>
+                </a>
+            </li>
+            <li>
+                <a href="haongo.me/categories/financials/" title="Financial stubs">
+                    <span>Financial stubs</span>
+                </a>
+            </li>
+            <li>
+                <a href="haongo.me/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.topcv.vn/xem-cv/BwdWUQ9VAQoDD1VXXVECAFdRVgEAAAUFAANXVg80fc" title="Author&#39;s Profile">
+                    <span>Author&#39;s Profile</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="haongo.me">Trang chủ</a>&nbsp;»&nbsp;<a href="haongo.me/posts/">Bài viết</a></div>
+    <h1 class="post-title">
+      Path to airflow 2
+    </h1>
+    <div class="post-meta">August 20, 2021&nbsp;·&nbsp;11 phút
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Mục lục</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#m%e1%bb%9bi-v%c3%a0o-ngh%e1%bb%81" aria-label="Mới vào nghề">Mới vào nghề</a></li>
+                <li>
+                    <a href="#n%c3%b4ng-d%c3%a2n-t%e1%ba%adp-th%c3%a0nh-cloud" aria-label="Nông dân tập thành cloud">Nông dân tập thành cloud</a></li>
+                <li>
+                    <a href="#airflow-2" aria-label="Airflow 2"><strong>Airflow 2</strong></a></li>
+                <li>
+                    <a href="#k%e1%ba%bft-lu%e1%ba%adn" aria-label="Kết luận">Kết luận</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><em>Airflow in the nut shell:</em></p>
+<ul>
+<li>Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò.</li>
+<li>Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job
+<ul>
+<li>Ví dụ như là select vào rows từ MySQL</li>
+<li>Thêm ít gia vị (Cooking)</li>
+<li>Load vào Datawarehouse</li>
+</ul>
+</li>
+</ul>
+<p><strong>Ké vài miếng quảng cáo</strong></p>
+<ul>
+<li>Bạn đang mong muốn tìm kiếm cơ hội mới</li>
+<li>Bạn muốn làm việc với những công nghệ big data tối tân nhất.</li>
+<li>Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build &amp; publish cho hơn 500 anh em TIKI xài.</li>
+</ul>
+<p>Đến ngay với team data nhé: <a href="https://tuyendung.tiki.vn/job/senior-data-engineer-data-platform-2082">JD đây nè</a></p>
+<h1 id="mới-vào-nghề">Mới vào nghề<a hidden class="anchor" aria-hidden="true" href="#mới-vào-nghề">#</a></h1>
+<p>Team Data Platform của Tiki sử dụng <a href="https://airflow.apache.org/">Apache Airflow</a> từ những ngày đầu lập team từ năm 2017. Cho tới hôm nay kiến trúc &amp; cách sử dụng airflow cũng thay đổi khá đáng kể. Bài viết này sẽ chia sẽ cách mà Team Data của dụng airflow, ưu nhược điểm của các cách dùng.</p>
+<p>Ngày xửa ngày xưa.</p>
+<p>Khi mình vào TIKI vào T9/2018, một lần được cho vào con airflow chính, một cách ngây thơ updates 1 packages.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># TLDR:</span>
+<span style="color:#75715e"># virtualenv python 2 &amp; airflow 1.8</span>
+pip install --upgrade pandas-gbq
+supervisorctl restart all
+exit
+</code></pre></div><p>Sau đó tắt máy đi ngủ, tới chiều anh em ping nhau, Airflow ra đi rồi các bác ạ, Rì pọt ra đi hết rồi ông giáo ạ. Nghe xong tè ra quần luôn.</p>
+<p>Mistakes:</p>
+<ul>
+<li>Không backup virtualenv trước khi run <code>pip install</code></li>
+</ul>
+<h1 id="nông-dân-tập-thành-cloud">Nông dân tập thành cloud<a hidden class="anchor" aria-hidden="true" href="#nông-dân-tập-thành-cloud">#</a></h1>
+<p><strong>1 năm sau (T9/2019)</strong></p>
+<p>Thời điểm này TIKI migrate từ Data Center lên (GCP) Google Cloud Platform. Thế là phải chuẩn bị bưng hệ thống một lần nữa.</p>
+<p>Ở thời điểm này có 3 con airflow đang chạy:</p>
+<ul>
+<li>1 con chạy jobs ETL (Airflow 1.8)</li>
+<li>1 con chạy sync snapshot từ MySQL/Postgres lên BigQuery (Airflow 1.8)</li>
+</ul>
+<p>Nghĩ, giờ lên cloud mà xài công nghệ out date thì nông dân quá. Quyết tâm chơi lớn cài airflow latest luôn. DAG thì chắc chỉ cần copy qua là xong, không vỡ gì âu.</p>
+<p><em>Được cấp 1 con VM mới trên GCP &amp; ssh vào pip install liền.</em></p>
+<p>Đang đợi thì tự tát cái bếp. Học Infras As Code các thứ rồi mà lại tay chân thế. Thế là ngồi viết ansible để cài airflow  =)). Pip install thì vài phút, ngồi viết mất vài tiếng.</p>
+<p>Copy dag nào thì dags đó vỡ</p>
+<ul>
+<li>Phát hiện ra là import path &amp; params đã thay đổi khá nhiều từ 1.8 lên 1.10. (Lúc này còn ngây thơ mà)</li>
+<li>Hành ngập mặt rồi, kiểu này migrate chắc tới tết, trong khi anh em lúc đó còn 15 ngày để cutdown.</li>
+</ul>
+<p>Ngồi nghĩ nghĩ, mếu được, thế này sau này kiểu gì cũng sẽ gặp case tương tự.</p>
+<p><em><strong>Lúc này sau 1 thời gian được rèn luyện ansible và tập làm văn kubernetes manifests bắt đầu có ý tưởng chế 1 yaml để viết config &amp; build nó thành dag.</strong></em></p>
+<p><a href="/posts/airflow-dags-the-right-way/">Xem bài viết nà</a></p>
+<p><em>TLDR</em>:</p>
+<ul>
+<li>Mình viết thêm 1 lớp để set default (giá trị mặc định của các field), tên <code>Operator</code> ngắn gọn xúc tích thay vì phải import 1 path dài ngoằn.</li>
+<li>Tự động phân quyền cho dag, alert callback vào slack/telegram khi dag failed.</li>
+<li>Mỗi team có 1 folder riêng trong git hoặc thích thì cho hăn luôn 1 git repo riêng.</li>
+</ul>
+<p><em><strong>Tiếp theo là giờ sẽ deploy ở đâu đây?</strong></em></p>
+<p>Tuy là nông dân nhưng vẫn rất thích đú trend Cờ lâu nây típ (Cloud Native) thế là bắt tay vào nghiên cứu để chạy trên kubernetes luôn.</p>
+<ul>
+<li>CeleryExecutor: có sẵn helm chart airflow để cài. Tuy nhiên lại gặp vấn đề là chúng ta phải tạo trước workers &amp; việc tự động scale cũng không dễ dàng gì.</li>
+<li>KubernetesExecutor: có thể tự động tạo <code>Pod</code> để run task mà không cần phải tạo worker trước. Nếu executor này kết với với <code>autoscaler</code> &amp; Preemtible Pool của <code>gke</code> thì tuyệt vời ông mặt zời. Chốt nhanh chốt nhanh.</li>
+</ul>
+<p>Nghiên cứu vài này thì cũng bắt đầu vào thiết kế &amp; bắt tay vào viết k8s manifest.</p>
+<p>Những tiêu chí khi deploy airflow trên k8s.</p>
+<ul>
+<li>Phải tiết kiệm: bằng cách tự scale node khi cần (điều này thì <code>autoscaler</code>của gke đã làm rất tốt.</li>
+<li>Một cách khác mình nghĩ tới là sử dụng <a href="https://cloud.google.com/preemptible-vms">Preemptible VM</a> của GCP: Với loại VM này thì thời gian tối đa của là 24h sau khi được tạo. Google có thể lấy lại (reclaim) bất kì thời điểm nào.</li>
+</ul>
+<p>Với những yêu cầu như trên thì mình thiết kế các deployment riêng như sau:</p>
+<ul>
+<li>Scheduler: Core của toàn hệ thống nên phải cực kì stable, nên mình quyết định chọn node standard. (Core chết thì cậu vàng cũng phải bán đi mới mua bánh mì ăn được).</li>
+<li>Webserver thành 1 deployment riêng (run trên preemtible pool) để tiết kiệm và để HA thì mình tăng ≥ 2 replicas + <code>podAntiAffinity</code> topology là <a href="http://kubernetes.io/hostname"><code>kubernetes.io/hostname</code></a>.</li>
+<li>Pod được tạo ra từ airflow scheduler mình set mặc định chạy qua preemtible pool (tiết kiếm tiền để mua bánh mì) &amp; tất nhiên là có <code>hidden option</code> để select node khác khi cần.</li>
+</ul>
+<p>Về docker image: Thời điểm này airflow chưa có official image và community docker vẫn còn thiếu nhiều thứ. Mình quyết định viết riêng 1 dockerfile &amp; đưa vào những dependencies cần thiết đủ để airflow chạy được.</p>
+<p>Sau khi đủ các nguyên vật liệu thì bắt đầu lên đồ thôi.</p>
+<p><img loading="lazy" src="images/feature-airflow_arch.png" alt="Airflow Architecture"  />
+</p>
+<p>Ngoài cách deploy airflow thì còn những bài toán sau cần giải quyết</p>
+<p><strong>Cost Saving vs Stable</strong></p>
+<ul>
+<li>Để đảm bảo task chạy ổn định trên Preemtible VM, cần phải bật auto retry cho toàn dag trên hệ thống (việc này cực kì đơn giản nhờ vào config engine).</li>
+</ul>
+<p><strong>Lưu file yaml ở đâu?</strong></p>
+<ul>
+<li>Việc sử dụng 1 file config riêng, mình hoàn toàn có thể support một giao diện để viết config hoặc fancy hơn là kéo thả.</li>
+<li>Nhưng nghĩ đi nghĩ lại thì build 1 UI như vậy khá tốn thời gian &amp; lại phát sinh thêm phải handle conflict khi nhiều người cùng sửa 1 dag.</li>
+<li>Vì vậy mình đã force mọi người dùng <strong>Git</strong>. Code yaml sẽ được sync vào deployment <code>Dag Importer</code>, ở đây yaml sẽ được validate &amp; convert thành python DAG file. Sau khi có file DAG, tới vấn đề tiếp theo.</li>
+</ul>
+<p><strong>Lưu dag ở đâu?</strong></p>
+<ul>
+<li>Lưu thẳng trong images: có nhược điểm là phải build image liên tục khi có thay đổi → Khó optimize được Pod startup time do phải check Pull Image. Build docker có 1 nhược điểm là khá chậm.</li>
+<li>Lưu ở Shared Stores: Hiện gại Persistent Disk của gke chưa support <code>Read Write Many</code> , điều này dẫn đến phải sử dụng NFS. IOPS của NFS cực kỳ thấp so với SSD.</li>
+<li>Việc chọn storage nào phụ thuộc rất nhiều vào kiến trúc của airflow: Sau khi nghiên cứu 1 hồi thì mình nhận thấy là airflow sẽ serialized dag vào database, webserver &amp; các worker đều đọc từ database này.</li>
+</ul>
+<p>⇒ Vì vậy mình chọn shared storages: không ảnh hưởng nhiều tới thời gian chạy task, 1 ưu điểm nữa là nó đơn giản hơn architect của hệ thống.</p>
+<p><strong>Logging như thế nào?</strong></p>
+<ul>
+<li>Khi lên kubernetes option bắt buộc là phải chọn 1 remote logging (cụ thể thì mình chọn gcs để lưu)</li>
+<li>Nhưng remote logging gặp phải vấn đề là không xem được lúc task đang chạy.</li>
+<li>Dẫn đến mình phải workaround bằng cách sử dụng 1 file system tạm để lưu logs của task đang chạy. Còn đuờng nào ngoài NFS nữa đâu.</li>
+</ul>
+<p><strong>Authentication &amp; Authorization</strong></p>
+<ul>
+<li>Mình định hướng build Airflow trở thành 1 open platform, mọi người đều có thể viết config &amp; chạy. Đối với định hướng như vậy, bắt buộc phải phân quyền thật kỹ &amp; tốt nhất là ở DAG level.</li>
+<li>Cũng khá may là airflow support Oauth2 &amp; cả access ở DAG level.</li>
+<li>Việc này trở nên khá đơn giản khi mà config system đã add sẵn DAG vào mỗi role.</li>
+</ul>
+<p><strong>Monitor &amp; Alerting</strong></p>
+<ul>
+<li>Với hệ thống config thì mình đã tự động gắn sẵn <strong>task_failed_callback.</strong> Mỗi team sẽ đuợc tạo 1 connection riêng (có thể là slack/telegram) &amp; lúc failed thì dag nhà ai nấy nhận &amp; tự đi check.</li>
+<li>Đối với airflow thì mình sử dụng  <a href="https://github.com/prometheus/statsd_exporter">Statsd Exporter</a> để expose metrics API cho prometheus và lên grafana tạo dashboard/alert.</li>
+</ul>
+<p><strong>Backfill dags như thế nào?</strong></p>
+<ul>
+<li>Ngày trước cái trên VM thì hay ssh vào server để chạy airflow backfill.</li>
+<li>Còn trên k8s thì ssh đâu mà vào. Vào pod để execute thì nó lại bị limit ở vài bạn engineer.</li>
+<li>Vì vậy mình đã custom lại 1 opensource là <a href="https://github.com/AnkurChoraywal/airflow-backfill-util">airflow-backfill-util</a> &amp; share quyền cho mọi người vào backfill.</li>
+</ul>
+<p><em><strong>Vài cảm nhận:</strong></em></p>
+<ul>
+<li>NFS everywhere.</li>
+<li>Nói là Preemtible VM nhưng mình cảm nhận là khá là stable, sau 2 năm sử dụng thì mình chưa gặp vấn đề gì quá lớn (Có thể do thiết kế system pro quá nên không bị lỗi :&quot;&gt;)
+<ul>
+<li>Lâu lâu có vài task chạy hơn 5h bị down, đối với những task này, mình question ngược lại tại sao nó lại chạy lâu thế →optimize DAG.</li>
+<li>Đối với Data Scientist Team: Mình white list cho viết hẵn Python code luôn, cho select node xịn để chạy. Chớ model train cũng hết nữa ngày.</li>
+</ul>
+</li>
+<li>Khi chạy airflow trên K8S thì Airflow không còn đơn thuần là chỉ ETL nữa, mà có thể chạy mọi thứ, thanks <a href="https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html">KubernetesPodOperator</a>.
+<ul>
+<li>Hiện tại mình luôn khuyến khích các bạn Data Scientist thay vì viết <code>PythonOperator</code> &amp; nhờ mình cài thêm dependencies vào base image, thì viết một Dockerfile chứ mọi thứ cần thiết ở trong đó (ML Libs, C++ Libs, Code &hellip;) &amp; config <a href="https://airflow.apache.org/docs/apache-airflow-providers-cncf-kubernetes/stable/operators.html">KubernetesPodOperator</a>.</li>
+<li>Việc này vừa đảm bảo tính ổn định, không cần phải add những thứ không cần thiết vào base images sẽ tốn time để pull → giảm startup time.</li>
+</ul>
+</li>
+</ul>
+<h1 id="airflow-2"><strong>Airflow 2</strong><a hidden class="anchor" aria-hidden="true" href="#airflow-2">#</a></h1>
+<p>Version 2.0 được release vào ngày  <a href="https://airflow.apache.org/docs/apache-airflow/stable/changelog.html#airflow-2-0-0-2020-12-18">2020-12-18</a> thế nhưng mình chưa dám update ngay, vì trước giờ mỗi lần chỉ update patch version của airflow không què chổ này thì chổ kia. Mà lỗi gặp nhiều nhất vẫn là google oauth2, và phần lớn là do lỗi depedencies 😐.</p>
+<p>Sau hơn 8h tháng delay thì quyết tâm làm 1 lần sau cuối.</p>
+<p>Lên danh sách những việc cần làm:</p>
+<ul>
+<li>Coi ngày: chọn ngày tốt mới dám upgrade (check xemngay.com)</li>
+<li>Làm theo upgrade guides: <a href="https://airflow.apache.org/docs/apache-airflow/stable/upgrading-to-2.html">https://airflow.apache.org/docs/apache-airflow/stable/upgrading-to-2.html</a>
+<ul>
+<li>Lên airflow 1.10.15</li>
+<li>Install backport provider &amp; update module_path vào cái operators (đơn giản là update vào config của operator alias).</li>
+<li>Generate pod_template_file</li>
+<li>Run airflow upgrade_check &amp; fix. Đa số lỗi mình gặp đến từ các DAG viết bằng python của team Data Scientist. Không còn cách nào khác là phải đi fix tay từng dag, cũng rất may là khoảng chưa tới 20 dags.</li>
+</ul>
+</li>
+</ul>
+<p>Sau khi lên bridges &amp; chọn đuợc ngày lành tháng tốt. Bắt đầu upgrade airflow 2. Ở tiki thì đa số DAG được chạy vào ban đêm &amp; buổi sáng. Riêng buổi chiều &amp; tối thì rất ít. Thời điểm vàng là đây.</p>
+<ul>
+<li>
+<p>Backup Metadata DB: Viết tâm thư gửi anh em system để lỡ mà sự việc không thành, vẫn còn đừong quay về nhà.</p>
+</li>
+<li>
+<p>Scale Down tất cả services: <code>Scheduler</code>, <code>WebServer</code>, <code>ImportDags</code></p>
+</li>
+<li>
+<p>Merge Pull Request để Build &amp; Deploy.</p>
+</li>
+<li>
+<p>Start 1 replica WebServer, execute bash &amp; run: <code>airflow db upgrade</code> vừa ngồi vừa nghe nhạc để tự trấn an mình =)), chớ lúc đó cũng teo hết mọi thứ rồi.</p>
+</li>
+<li>
+<p>Đợi khoàng 30 phút thì migrate run xong. Mình bắt đầu lên web ui để kiểm tra xem có bị vỡ gì không. Thấy mọi thứ có vẻ ổn.</p>
+</li>
+<li>
+<p>Scale scheduler lên 1 replica. Thấy DAG mếu chạy, bắt đầu xanh cmn mặt.</p>
+<ul>
+<li>Không run được do entrypoint trong docker đã đuợc add sẵn <code>airflow</code>  command. Sau đó <code>args</code> lại add thêm <code>airflow</code> nữa.</li>
+</ul>
+</li>
+<li>
+<p>Sau khi fix lỗi command thì thấy DAG bắt đầu chạy: đi kiểm tra một vòng thì đa số DAG chạy ok, có một số lỗi vặt khá dị:</p>
+<ul>
+<li><code>env_vars</code> của KubernetesPodOperator tự động nhận diện cái env bắt đầu bằng <code>/</code> thành template file → dẫn đến start pod lỗi.</li>
+<li>Bug nhọ nhất là admin không được edit user permissions nữa. Phải ngồi đợi bản fix tiếp theo thôi.</li>
+<li>Logging: Không còn sử dụng connection_id để lấy logging credention cho gcs mà phải mount credential vào pod.</li>
+<li>Một vài lỗi nhỏ khác do sử dụng internal function của airflow.</li>
+</ul>
+</li>
+</ul>
+<p><em><strong>Vài cảm nhận về Airflow 2:</strong></em></p>
+<ul>
+<li>Performance tăng khủng khiếp: Khi số lựợng DAG tăng lên từ vài trăm lên gần 2000, một vấn đề rất lớn gặp phải đối với airflow 1 là thời gian delay giữa các task trong dag rất lớn. Phải mất từ 5 - 15p giữa các task &amp; thời gian start DAG delay khoàng 5 phút so với giờ được set. Khi lên version 2 thì gần như về 0. Điều này cực kỳ có ý nghĩa đối với những task chạy mỗi 1 hoặc 2 phút.</li>
+<li>UI mới nhìn đẹp hơn hẵn &amp; thực tế là ai cũng khen (chê xấu là disable account nhé).</li>
+<li>Việc upgrade lần này êm hơn hẵn so với dự tính của mình là có thể không lên được
+<ul>
+<li>Vì mình thấy được qua các lần upgrade trước, vỡ rất nhiều chổ</li>
+</ul>
+</li>
+</ul>
+<h1 id="kết-luận">Kết luận<a hidden class="anchor" aria-hidden="true" href="#kết-luận">#</a></h1>
+<p>Còn chờ đợi gì mà không lên airflow 2 ngay và thôi.
+Mình đã upgrade thành công bạn cũng thế. Và nhớ coi ngày trước khi upgrade nha.</p>
+<p><strong>Ở trên có quảng cáo rồi, nhưng mình vẫn cứ đăng lại</strong></p>
+<ul>
+<li>Bạn đang mong muốn tìm kiếm cơ hội mới</li>
+<li>Bạn muốn làm việc với những công nghệ big data tối tân nhất.</li>
+<li>Xài serveless tốn kém quá với chậm chạp, bạn có thể tự build &amp; publish cho hơn 500 anh em TIKI xài.</li>
+</ul>
+<p>Đến ngay với team data nhé: <a href="https://tuyendung.tiki.vn/job/senior-data-engineer-data-platform-2082">JD đây nè</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="haongo.me/tags/airflow/">airflow</a></li>
+      <li><a href="haongo.me/tags/data_infra/">data_infra</a></li>
+      <li><a href="haongo.me/tags/data_engineering/">data_engineering</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="haongo.me/posts/airflow-dags-the-right-way/">
+    <span class="title">« Trang trước</span>
+    <br>
+    <span>Airflow Dags The Right Way</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Path to airflow 2 on twitter"
+        href="https://twitter.com/intent/tweet/?text=Path%20to%20airflow%202&amp;url=haongo.me%2fposts%2fapache-airflow%2f&amp;hashtags=airflow%2cdata_infra%2cdata_engineering">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Path to airflow 2 on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=haongo.me%2fposts%2fapache-airflow%2f&amp;title=Path%20to%20airflow%202&amp;summary=Path%20to%20airflow%202&amp;source=haongo.me%2fposts%2fapache-airflow%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Path to airflow 2 on reddit"
+        href="https://reddit.com/submit?url=haongo.me%2fposts%2fapache-airflow%2f&title=Path%20to%20airflow%202">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Path to airflow 2 on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=haongo.me%2fposts%2fapache-airflow%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Path to airflow 2 on whatsapp"
+        href="https://api.whatsapp.com/send?text=Path%20to%20airflow%202%20-%20haongo.me%2fposts%2fapache-airflow%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Path to airflow 2 on telegram"
+        href="https://telegram.me/share/url?text=Path%20to%20airflow%202&amp;url=haongo.me%2fposts%2fapache-airflow%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2021 <a href="haongo.me">TheAmazingLab</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+    menu.onscroll = function () {
+        localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = 'Sao chép';
+
+        function copyingDone() {
+            copybutton.innerText = 'Đã sao chép!';
+            setTimeout(() => {
+                copybutton.innerText = 'Sao chép';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

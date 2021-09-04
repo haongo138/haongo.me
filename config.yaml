@@ -1,0 +1,113 @@
+baseURL: haongo.me
+languageCode: vi-vn
+title: TheAmazingLab
+theme: PaperMod
+defaultContentLanguage: 'vi'
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+# googleAnalytics: UA-123-45
+
+minify:
+    disableXML: true
+    # minifyOutput: true
+
+languages:
+  vi:
+    languageName: "Vietnamese"
+    weight: 1
+    menu:
+      main:
+      - name: Financial stubs
+        url: categories/financials/
+        weight: 10
+      - name: Engineering Wikis
+        url: categories/engineerings/
+        weight: 10
+      - name: Tags
+        url: tags/
+        weight: 10
+      - name: Author's Profile
+        url: https://www.topcv.vn/xem-cv/BwdWUQ9VAQoDD1VXXVECAFdRVgEAAAUFAANXVg80fc
+        weight: 20
+
+params:
+  homeInfoParams:
+    Title: 🌙 THE AMAZING LAB
+    Content: >
+        Hi there, I'm on my way to be not only **a professional SRE** but also **a better invertor**. So this's the place which my learning curve being logged...
+
+        - If you love it or the author **:XD:**, do give me a 🌟 on **Github**
+  socialIcons:
+    - name: "github"
+      url: "https://github.com/haongo138"
+    - name: "hackerrank"
+      url: "https://www.hackerrank.com/haoxray"
+    - name: "facebook"
+      url: "https://facebook.com/haongo138"
+    - name: "instagram"
+      url: "https://instagram.com/haongo138"
+    - name: "linkedin"
+      url: "https://www.linkedin.com/in/hao-ngo-9b3873185/"
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+  defaultTheme: auto
+  # disableThemeToggle: true
+  ShowShareButtons: true
+  ShowReadingTime: true
+  # disableSpecial1stPost: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowToc: true
+
+outputs:
+    home:
+      - HTML
+      - RSS
+      - JSON # is necessary
+
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+
+privacy:
+  vimeo:
+    disabled: false
+    simple: true
+
+  twitter:
+    disabled: false
+    enableDNT: true
+    simple: true
+
+  instagram:
+    disabled: false
+    simple: true
+
+  youtube:
+    disabled: false
+    privacyEnhanced: true
+
+services:
+  instagram:
+    disableInlineCSS: true
+  twitter:
+    disableInlineCSS: true

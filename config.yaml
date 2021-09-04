@@ -23,15 +23,18 @@ languages:
     weight: 1
     menu:
       main:
+      - name: Home
+        url: /
+        weight: 10
       - name: Financial stubs
         url: /categories/financials/
-        weight: 10
+        weight: 15
       - name: Engineering Wikis
         url: /categories/engineerings/
-        weight: 10
+        weight: 15
       - name: Tags
         url: /tags/
-        weight: 10
+        weight: 15
       - name: Author's Profile
         url: https://www.topcv.vn/xem-cv/BwdWUQ9VAQoDD1VXXVECAFdRVgEAAAUFAANXVg80fc
         weight: 20

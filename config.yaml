@@ -18,8 +18,8 @@ minify:
     # minifyOutput: true
 
 languages:
-  vi:
-    languageName: "Vietnamese"
+  en:
+    languageName: "English"
     weight: 1
     menu:
       main:

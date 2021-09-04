@@ -1,9 +1,9 @@
 baseURL:
 relativeURLs: false
-languageCode: vi-vn
+languageCode: en-us
 title: TheAmazingLab
 theme: PaperMod
-defaultContentLanguage: 'vi'
+defaultContentLanguage: 'en'
 
 enableInlineShortcodes: true
 enableRobotsTXT: true

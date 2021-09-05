@@ -26,15 +26,12 @@ languages:
     weight: 1
     menu:
       main:
-      - name: Home
-        url: /
-        weight: 10
       - name: Financial stubs
         url: /categories/financials/
         weight: 15
       - name: Engineering Wikis
         url: /categories/engineerings/
-        weight: 15
+        weight: 10
       - name: Tags
         url: /tags/
         weight: 15

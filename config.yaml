@@ -11,7 +11,9 @@ buildDrafts: false
 buildFuture: false
 buildExpired: false
 enableEmoji: true
-disqusShortname: XYW
+
+# Enable comments by entering your Disqus shortname
+disqusShortname: haongo138
 # googleAnalytics: UA-123-45
 
 minify:

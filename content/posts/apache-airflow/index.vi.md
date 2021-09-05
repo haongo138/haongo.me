@@ -1,10 +1,16 @@
-
 ---
 title: "Path to airflow 2"
 date: 2021-08-20T18:09:24+07:00
 publishdate: 2021-08-22
 tags: ['airflow', 'data_infra', 'data_engineering']
 categories: ['engineerings']
+tocopen: true
+comments: true
+# cover:
+#   image: posts/apache-airflow/images/feature-airflow_arch.png
+#   alt: "cover"
+#   caption: ""
+#   relative: false
 resources:
 - name: features
   src: images/feature-airflow_arch.png
@@ -13,9 +19,9 @@ resources:
 *Airflow in the nut shell:*
 - Một phiên bảo cron tab (chạy mỗi ngày, mỗi tuần, mỗi giờ mỗi tháng) với UI xịn xò.
 - Các tín đồ data hay sử dụng để viết ETL (Extract Transform Load) job
-    - Ví dụ như là select vào rows từ MySQL
-    - Thêm ít gia vị (Cooking)
-    - Load vào Datawarehouse
+  - Ví dụ như là select vào rows từ MySQL
+  - Thêm ít gia vị (Cooking)
+  - Load vào Datawarehouse
 
 **Ké vài miếng quảng cáo**
 - Bạn đang mong muốn tìm kiếm cơ hội mới

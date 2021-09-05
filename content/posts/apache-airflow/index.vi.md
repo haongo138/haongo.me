@@ -7,7 +7,7 @@ categories: ['engineerings']
 tocopen: true
 comments: true
 cover:
-  image: posts/apache-airflow/images/feature-airflow_arch.png
+  image: /posts/apache-airflow/images/feature-airflow_arch.png
   alt: "cover"
   caption: ""
   relative: false

@@ -6,11 +6,11 @@ tags: ['airflow', 'data_infra', 'data_engineering']
 categories: ['engineerings']
 tocopen: true
 comments: true
-# cover:
-#   image: posts/apache-airflow/images/feature-airflow_arch.png
-#   alt: "cover"
-#   caption: ""
-#   relative: false
+cover:
+  image: posts/apache-airflow/images/feature-airflow_arch.png
+  alt: "cover"
+  caption: ""
+  relative: false
 resources:
 - name: features
   src: images/feature-airflow_arch.png

@@ -5,11 +5,11 @@ publishdate: 2021-08-31
 tags: ['airflow', 'data_engineering']
 categories: ['engineerings']
 tocopen: true
-# cover:
-#   image: /posts/airflow-dags-the-right-way/images/dags-config.png
-#   alt: ""
-#   caption: ""
-#   relative: false
+cover:
+  image: /posts/airflow-dags-the-right-way/images/dags-config.png
+  alt: ""
+  caption: ""
+  relative: false
 resources:
 - name: features
   src: images/dags-config.png

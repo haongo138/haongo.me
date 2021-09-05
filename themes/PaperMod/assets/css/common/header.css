@@ -16,6 +16,7 @@
 #menu {
     display: flex;
     margin: auto var(--gap);
+    /* font-weight: 500; */
 }
 
 .logo {

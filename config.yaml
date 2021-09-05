@@ -48,7 +48,7 @@ params:
   comments: true
   cover:
     responsiveImages: false
-    linkFullImages: true  
+    linkFullImages: false  
   assets:
     favicon: "/logo.ico"
   label:
@@ -56,7 +56,7 @@ params:
     icon: /title.ico
     iconHeight: 35
   homeInfoParams:
-    Title: Hi there
+    Title: ""
     Content: >
         I'm on my way to be a professional **Big Data Engineer**. So this's the place which my learning curve is logged...
 

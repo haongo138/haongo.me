@@ -61,6 +61,7 @@
   <section class="entry-content">
     <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
   </section>
+  <a class="see-more" href="#">Xem thêm...</a>
   {{- end }}
   {{- if not (.Param "hideMeta") }}
   <footer class="entry-footer">
